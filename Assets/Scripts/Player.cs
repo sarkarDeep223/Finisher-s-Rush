@@ -28,22 +28,11 @@ public class Player : MonoBehaviour
 {
 
 
-
-
-
-
-
     private Rigidbody2D rigidbody2d;
 
-
-
-
-
-    [SerializeField] private Transform groundCheckTransform;
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private float speed = 7f;
     [SerializeField] private float jumpForce = 14f;
-    [SerializeField] private float groundCheckRadius = 0.2f;
     // [SerializeField] private SpriteRenderer spriteRenderer;
 
 
@@ -51,14 +40,6 @@ public class Player : MonoBehaviour
 
 
     public event EventHandler<OnMovementEventArgs> OnPlayerMoving;
-
-
-
-
-
-
-    // [SerializeField] Animator animator;
-    private bool isGrounded;
 
 
     private void Awake()
@@ -69,10 +50,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        IsGrounded();
         HandelJump();
         UpdateMovementState();
-        // Jump();
     }
 
 
@@ -80,20 +59,17 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float moveDirection;
-        Vector2 move;
+        float moveDirection = 0f;
         if (GameInput.Instance.IsRightPressed())
         {
             moveDirection = 1f;
-            move = new Vector2(moveDirection * speed, rigidbody2d.linearVelocity.y);
-            MoveVertical(move);
         }
         else if (GameInput.Instance.IsLeftPressed())
         {
             moveDirection = -1f;
-            move = new Vector2(moveDirection * speed, rigidbody2d.linearVelocity.y);
-            MoveVertical(move);
         }
+        Vector2 move = new Vector2(moveDirection * speed, rigidbody2d.linearVelocity.y);
+        MoveVertical(move);
     }
 
 
@@ -102,7 +78,7 @@ public class Player : MonoBehaviour
     {
         MovementState state;
 
-        if (!isGrounded)
+        if (!IsGrounded())
         {
             if (rigidbody2d.linearVelocity.y > 0.01f)
             {
@@ -124,6 +100,7 @@ public class Player : MonoBehaviour
                 state = MovementState.idle;
             }
         }
+        
 
         OnPlayerMoving?.Invoke(this, new OnMovementEventArgs()
         {
@@ -150,15 +127,17 @@ public class Player : MonoBehaviour
 
     private void HandelJump()
     {
-        if (isGrounded && GameInput.Instance.IsJumpPressed())
+        if (IsGrounded() && GameInput.Instance.IsJumpPressed())
         {
             rigidbody2d.linearVelocity = new Vector2(rigidbody2d.linearVelocity.x, jumpForce);
         }
     }
 
-    private void IsGrounded()
+    private bool IsGrounded()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheckTransform.position, groundCheckRadius, playerMask);
+        bool hit = Physics2D.Raycast(transform.position, Vector2.down, 0.6f, playerMask);
+        Debug.DrawRay(transform.position, Vector2.down * 0.6f, Color.red);
+        return hit;
     }
 
 

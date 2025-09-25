@@ -31,6 +31,11 @@ public class PlayerAnimation : MonoBehaviour
 
     private void Player_OnPlayerMoving(object sender, OnMovementEventArgs e)
     {
+
+        Debug.Log(e.moveVelocity.linearVelocity.x);
+
+
+
         SpriteFlip(e.moveVelocity.linearVelocity.x);
         switch (e.state)
         {
@@ -51,14 +56,17 @@ public class PlayerAnimation : MonoBehaviour
 
     private void SpriteFlip(float moveDirection)
     {
-        if (moveDirection > 0f)
+        float threshold = 0.01f; // ignore tiny values
+
+        if (moveDirection > threshold)
         {
-            spriteRenderer.flipX = true;
+            spriteRenderer.flipX = true;  // facing right
         }
-        else if (moveDirection < 0f)
+        else if (moveDirection < -threshold)
         {
-            spriteRenderer.flipX = false;
+            spriteRenderer.flipX = false; // facing left
         }
+        // if velocity is near 0, don't flip → keeps last direction
     }
 
     private void SetIdle()
