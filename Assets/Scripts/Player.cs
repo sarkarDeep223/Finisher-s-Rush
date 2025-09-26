@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
 
 
     private Rigidbody2D rigidbody2d;
+    private Collider2D collider2d;
 
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private float speed = 7f;
@@ -36,6 +37,7 @@ public class Player : MonoBehaviour
     // [SerializeField] private SpriteRenderer spriteRenderer;
 
 
+    private bool isColliding = false;
 
 
 
@@ -45,6 +47,7 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
+        collider2d = GetComponent<Collider2D>();
     }
 
 
@@ -69,8 +72,11 @@ public class Player : MonoBehaviour
             moveDirection = -1f;
         }
         Vector2 move = new Vector2(moveDirection * speed, rigidbody2d.linearVelocity.y);
+        move = AdjustForEdges(move);
         MoveVertical(move);
     }
+
+
 
 
 
@@ -100,7 +106,7 @@ public class Player : MonoBehaviour
                 state = MovementState.idle;
             }
         }
-        
+
 
         OnPlayerMoving?.Invoke(this, new OnMovementEventArgs()
         {
@@ -113,7 +119,13 @@ public class Player : MonoBehaviour
 
 
 
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        // Optional: called every frame while colliding
+        isColliding = true;
 
+
+    }
 
 
 
@@ -135,11 +147,50 @@ public class Player : MonoBehaviour
 
     private bool IsGrounded()
     {
-        bool hit = Physics2D.Raycast(transform.position, Vector2.down, 0.6f, playerMask);
-        Debug.DrawRay(transform.position, Vector2.down * 0.6f, Color.red);
-        return hit;
+        float rayLength = 0.6f;
+        Vector2 boundsMin = collider2d.bounds.min;
+        Vector2 boundsMax = collider2d.bounds.max;
+        Vector2 center = new Vector2((boundsMin.x + boundsMax.x) / 2, boundsMin.y);
+        RaycastHit2D hitCenter = Physics2D.Raycast(center, Vector2.down, rayLength, playerMask);
+        Debug.DrawRay(center, Vector2.down * rayLength, Color.green);
+        return hitCenter;
     }
 
+
+
+
+    
+
+
+
+
+    private Vector2 AdjustForEdges(Vector2 move)
+    {
+        Vector2 boundsMin = collider2d.bounds.min;
+        Vector2 boundsMax = collider2d.bounds.max;
+        Vector2 right = new Vector2(boundsMax.x - 0.4f, boundsMin.y);
+        Vector2 left = new Vector2(boundsMin.x + 0.4f, boundsMin.y);
+        RaycastHit2D hitLeft = Physics2D.Raycast(left, Vector2.down, 0.6f, playerMask);
+        RaycastHit2D hitRight = Physics2D.Raycast(right, Vector2.down, 0.6f, playerMask);
+        Debug.DrawRay(left, Vector2.down * 0.6f, Color.red);
+        Debug.DrawRay(right, Vector2.down * 0.6f, Color.blue);
+        float horizontalVelocity = move.x;
+        if (isColliding)
+        {
+            if (horizontalVelocity > 0.01f && !hitRight)
+            {
+                Debug.Log("Right edge - moving forward");
+                move.x = 2 * speed; // boost forward
+            }
+            else if (horizontalVelocity < -0.01f && !hitLeft)
+            {
+                Debug.Log("Left edge - moving backward");
+                move.x = -2 * speed; // boost backward
+            }
+        }
+
+        return move;
+    }
 
 
 

@@ -32,7 +32,7 @@ public class PlayerAnimation : MonoBehaviour
     private void Player_OnPlayerMoving(object sender, OnMovementEventArgs e)
     {
 
-        Debug.Log(e.moveVelocity.linearVelocity.x);
+        // Debug.Log(e.moveVelocity.linearVelocity.x);
 
 
 
