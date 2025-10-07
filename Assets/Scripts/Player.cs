@@ -30,7 +30,6 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rigidbody2d;
     private Collider2D collider2d;
-
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private float speed = 7f;
     [SerializeField] private float jumpForce = 14f;
@@ -73,6 +72,7 @@ public class Player : MonoBehaviour
         }
         Vector2 move = new Vector2(moveDirection * speed, rigidbody2d.linearVelocity.y);
         move = AdjustForEdges(move);
+        Debug.Log("Move: " + move);
         MoveVertical(move);
     }
 
@@ -83,7 +83,6 @@ public class Player : MonoBehaviour
     private void UpdateMovementState()
     {
         MovementState state;
-
         if (!IsGrounded())
         {
             if (rigidbody2d.linearVelocity.y > 0.01f)
@@ -121,10 +120,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        // Optional: called every frame while colliding
         isColliding = true;
-
-
     }
 
 
@@ -188,7 +184,6 @@ public class Player : MonoBehaviour
                 move.x = -2 * speed; // boost backward
             }
         }
-
         return move;
     }
 
