@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 
@@ -33,7 +36,14 @@ public class Player : MonoBehaviour
     [SerializeField] private LayerMask playerMask;
     [SerializeField] private float speed = 7f;
     [SerializeField] private float jumpForce = 14f;
+
+
+    // [SerializeField] private CameraShake cameraShake;
     // [SerializeField] private SpriteRenderer spriteRenderer;
+
+
+
+    // [] private CinemachineImpulseSource impulseManager;
 
 
     private bool isColliding = false;
@@ -47,6 +57,7 @@ public class Player : MonoBehaviour
     {
         rigidbody2d = GetComponent<Rigidbody2D>();
         collider2d = GetComponent<Collider2D>();
+        // impulseManager = GetComponent<CinemachineImpulseSource>();
     }
 
 
@@ -72,7 +83,6 @@ public class Player : MonoBehaviour
         }
         Vector2 move = new Vector2(moveDirection * speed, rigidbody2d.linearVelocity.y);
         move = AdjustForEdges(move);
-        Debug.Log("Move: " + move);
         MoveVertical(move);
     }
 
@@ -155,7 +165,7 @@ public class Player : MonoBehaviour
 
 
 
-    
+
 
 
 
@@ -175,7 +185,6 @@ public class Player : MonoBehaviour
         {
             if (horizontalVelocity > 0.01f && !hitRight)
             {
-                Debug.Log("Right edge - moving forward");
                 move.x = 2 * speed; // boost forward
             }
             else if (horizontalVelocity < -0.01f && !hitLeft)
@@ -186,6 +195,37 @@ public class Player : MonoBehaviour
         }
         return move;
     }
+
+
+
+
+    // private void OnTriggerEnter2D(Collider2D collision)
+    // {
+    //     // Debug.Log("Trigger Entered with " + collision.name);
+    //     if (collision.GetComponent<Obsticel>())
+    //     {
+    //         GameOverSequence();
+    //     }
+    // }
+
+
+    // private void GameOverSequence()
+    // {
+
+        // CameraShake.instance.cameraEffect(impulseManager);
+
+        // 1️⃣ Camera shake for impact
+        // if (cameraShake != null)
+        // StartCoroutine(cameraShake.Shake(3f, 0.4f)); // (duration, magnitude)
+
+        // 2️⃣ Slow down or freeze time briefly
+        // Time.timeScale = 0f; 
+        // yield return new WaitForSecondsRealtime(0.3f); // Wait in real time (not affected by timeScale)
+
+        // 3️⃣ Reset time and reload the level
+        // Time.timeScale = 1f;
+        // SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    // }
 
 
 

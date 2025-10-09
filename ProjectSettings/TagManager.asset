@@ -50,5 +50,8 @@ TagManager:
   - name: Forground
     uniqueID: 1949049535
     locked: 0
+  - name: Obsticel
+    uniqueID: 2154573091
+    locked: 0
   m_RenderingLayers:
   - Default
